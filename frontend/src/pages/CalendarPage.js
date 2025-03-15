@@ -7,7 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { calendarService } from '../services/api';
 
 const CalendarPage = () => {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = React.useState([]);;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -16,37 +16,41 @@ const CalendarPage = () => {
   const [newDates, setNewDates] = useState({ startDate: null, endDate: null });
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const result = await calendarService.getCalendarTasks();
-        if (result.success) {
-          // Convert tasks to FullCalendar format
-          const events = result.data.tasks.map(task => ({
-            id: `${task.studyPlanId}-${task.id}`,
-            title: task.title,
-            start: task.start,
-            end: task.end,
-            backgroundColor: getTaskColor(task.priority, task.completed),
-            borderColor: getTaskColor(task.priority, task.completed),
-            textColor: '#FFFFFF',
-            extendedProps: {
-              ...task
-            }
-          }));
-          setTasks(events);
-        } else {
-          setError(result.error);
-        }
-      } catch (err) {
-        setError('Failed to load tasks');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchTasks = async () => {
+    try {
+      const result = await calendarService.getCalendarTasks();
+      
+      console.log("API Response:", result); // Debugging line to check API response
+      
+      if (result.success && Array.isArray(result.data)) {  
+      const events = result.data.map(task => ({ // Use result.data directly
+        id: `${task.studyPlanId}-${task.id}`,
+        title: task.title,
+        start: task.start,
+        end: task.end,
+        backgroundColor: getTaskColor(task.priority, task.completed),
+        borderColor: getTaskColor(task.priority, task.completed),
+        textColor: '#FFFFFF',
+        extendedProps: { ...task }
+      }));
+      setTasks(events);
+    } else {
+      console.error("No tasks found in API response:", result);
+      setTasks([]); 
+      setError(result.error || "No tasks available");
+    }
 
-    fetchTasks();
-  }, []);
+    } catch (err) {
+      console.error("Failed to load tasks:", err);
+      setError('Failed to load tasks');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchTasks();
+}, []);
+
 
   const getTaskColor = (priority, completed) => {
     if (completed) {

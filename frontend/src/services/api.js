@@ -4,6 +4,18 @@ import axios from 'axios';
 // Set base URL for API requests
 axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
+// Add request/response interceptors
+  axios.interceptors.response.use(
+    response => response,
+    error => {
+      if (error.response?.status === 401) {
+        localStorage.removeItem('token');
+        window.location = '/login';
+      }
+      return Promise.reject(error);
+    }
+  );
+
 // Study plan service
 export const studyPlanService = {
   // Generate a new study plan
@@ -80,4 +92,18 @@ export const calendarService = {
       };
     }
   },
+
+  // Add to studyPlanService
+  deleteStudyPlan: async (id) => {
+    try {
+      await axios.delete(`/api/study-plan/${id}`);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || 'Failed to delete study plan'
+      };
+    }
+  },
+
 };

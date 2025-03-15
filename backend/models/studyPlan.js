@@ -53,4 +53,9 @@ const StudyPlanSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('StudyPlan', StudyPlanSchema);
+// Check if model already exists
+if (mongoose.models.StudyPlan) {
+  module.exports = mongoose.model('StudyPlan');
+} else {
+  module.exports = mongoose.model('StudyPlan', StudyPlanSchema);
+}
