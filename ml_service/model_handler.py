@@ -4,9 +4,7 @@ import json
 import os
 
 # Load API key from environment variable (set this in your system)
-# GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GROQ_API_KEY="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"
-
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
